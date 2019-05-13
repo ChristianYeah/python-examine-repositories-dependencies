@@ -8,9 +8,9 @@ class Tree:
 
     def __generate(self, data):
         if not data:
-            raise Exception("数据为空".format(data))
+            raise Exception("empty data".format(data))
         elif self.__cyclic(data):
-            raise Exception("环形依赖\n{}".format(data))
+            raise Exception("cyclic DAG\n{}".format(data))
         elif not self.__cyclic(data):
             # 初始化树
             root_tree = Node('root')
