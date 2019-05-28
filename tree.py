@@ -16,12 +16,16 @@ class Tree:
             root_tree = Node('root')
             # 将无依赖的节点加入root子节点
             # 删除数据中的无依赖节点
+            deletes = []
             for k in data.keys():
                 if not data[k]:
                     root_tree.insert(k)
-                    del data[k]
+                    deletes.append(k)
+            for k in deletes:
+                del data[k]
             # 遍历剩余数据当剩余数据不为空
             while data:
+                deletes = []
                 for k in data.keys():
                     # 当全部父节点存在时 则插入子节点
                     if not any([False if root_tree.find(parent) else True for parent in data[k]]):
@@ -29,7 +33,9 @@ class Tree:
                             # 向父节点插入子节点
                             root_tree.find(parent).insert(k)
                         # 删除整个数据
-                        del data[k]
+                        deletes.append(k)
+                for k in deletes:
+                    del data[k]
             return root_tree
 
     @staticmethod
@@ -106,7 +112,6 @@ class Tree:
         tmp_steps = {}
         for key, val in self.steps.items():
             for index in range(len(val)):
-                print(self.tree.find(self.steps[key][index]["name"]))
                 name = self.steps[key][index]["name"]
                 level = self.steps[key][index]["level"]
                 if name not in tmp_steps:
