@@ -93,31 +93,52 @@ class Tree:
         if node is None:
             node = self.tree
         if delta in self.steps:
-            self.steps[delta].append(node.name)
+            self.steps[delta].append({"name": node.name, "level": node.level})
         else:
-            self.steps[delta] = [node.name]
+            self.steps[delta] = [{"name": node.name, "level": node.level}]
         for name, _node in node.children.items():
             self.__generate_steps(delta + 1, _node)
 
     def show_steps(self):
         self.__generate_steps()
+        step_1 = self.steps[1]
         del self.steps[1]
+        tmp_steps = {}
+        for key, val in self.steps.items():
+            for index in range(len(val)):
+                print(self.tree.find(self.steps[key][index]["name"]))
+                name = self.steps[key][index]["name"]
+                level = self.steps[key][index]["level"]
+                if name not in tmp_steps:
+                    tmp_steps[name] = {"level": level, "key": key, "index": index}
+                else:
+                    if tmp_steps[name]['level'] < level:
+                        tmp = tmp_steps[name]
+                        tmp_steps[name] = {"level": level, "key": key, "index": index}
+                        del self.steps[tmp["key"]][tmp["index"]]
+        d = {}
+        for key, items in self.steps.items():
+            for item in items:
+                if key not in d:
+                    d[key] = [item["name"]]
+                else:
+                    d[key].append(item["name"])
+        self.steps[1] = step_1
         steps = {}
-        steps_done = set()
-        for index in self.steps.keys():
-            steps[index - 1] = [k for k in list(set(self.steps[index])) if k not in steps_done]
-            steps_done = set(list(steps_done) + steps[index - 1])
+        for index in d.keys():
+            steps[index - 1] = [k for k in list(set(d[index]))]
         return steps
 
 
 class Node:
-    def __init__(self, name):
+    def __init__(self, name, level=1):
         self.name = name
         self.children = dict()
+        self.level = level
 
     def insert(self, name):
         if name not in self.children:
-            self.children[name] = Node(name)
+            self.children[name] = Node(name, self.level + 1)
 
     def bulk_insert(self, names):
         for name in names:
